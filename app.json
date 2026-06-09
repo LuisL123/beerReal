@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Cheers",
+    "slug": "cheers-beerapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.beerapp.cheers"
+    },
+    "android": {
+      "package": "com.beerapp.cheers",
+      "adaptiveIcon": {
+        "backgroundColor": "#0D0D0D"
+      }
+    },
+    "scheme": "cheers",
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Cheers to access your camera to capture your drinks.",
+          "microphonePermission": "Allow Cheers to access your microphone."
+        }
+      ],
+      "expo-router"
+    ]
+  }
+}
