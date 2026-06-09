@@ -1,0 +1,1 @@
+BeReal-style beer social app called Cheers with React Native, Expo, and Supabase. The app is working with camera, feed, and profile screens. Next: add new features like the Guinness pour video recorder.
