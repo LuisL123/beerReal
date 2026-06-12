@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, TouchableOpacity, FlatList,
   Image, Alert, ActivityIndicator, Dimensions,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
@@ -17,6 +17,7 @@ export default function ProfileScreen() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -59,6 +60,9 @@ export default function ProfileScreen() {
         ListHeaderComponent={
           <>
             <View style={styles.header}>
+              <TouchableOpacity onPress={() => router.push('/activity')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="calendar-outline" size={24} color={COLORS.textMuted} />
+              </TouchableOpacity>
               <Text style={styles.headerTitle}>Profile</Text>
               <TouchableOpacity onPress={signOut} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Ionicons name="log-out-outline" size={24} color={COLORS.textMuted} />

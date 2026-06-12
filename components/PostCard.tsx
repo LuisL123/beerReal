@@ -20,12 +20,18 @@ const { width: SW } = Dimensions.get('window');
 const CARD_PADDING = 12;
 const PHOTO_SIZE = SW - CARD_PADDING * 2;
 
-function timeAgo(iso: string): string {
-  const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (secs < 60) return 'just now';
-  if (secs < 3600) return `${Math.floor(secs / 60)}m`;
-  if (secs < 86400) return `${Math.floor(secs / 3600)}h`;
-  return `${Math.floor(secs / 86400)}d`;
+function formatPostTime(iso: string): string {
+  const date = new Date(iso);
+  const now = new Date();
+  const time = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric', minute: '2-digit', hour12: true,
+  }).format(date);
+  if (date.toDateString() === now.toDateString()) return `Today, ${time}`;
+  const dateStr = new Intl.DateTimeFormat('en-US', {
+    month: 'short', day: 'numeric',
+    ...(date.getFullYear() !== now.getFullYear() ? { year: 'numeric' } : {}),
+  }).format(date);
+  return `${dateStr}, ${time}`;
 }
 
 function CommentPreview({ comments, onPress }: { comments: Comment[]; onPress: () => void }) {
@@ -104,7 +110,7 @@ export default function PostCard({ post, currentUserId, onReact, onCommentPress 
           <View style={styles.drinkBadge}>
             <Text style={styles.drinkBadgeText}>{post.drink_type}</Text>
           </View>
-          <Text style={styles.time}>{timeAgo(post.created_at)}</Text>
+          <Text style={styles.time}>{formatPostTime(post.created_at)}</Text>
         </View>
       </View>
 
