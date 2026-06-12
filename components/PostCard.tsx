@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { Post, ReactionKind } from '@/types';
+import { Post, Comment, ReactionKind } from '@/types';
 import { COLORS } from '@/constants/colors';
 import { REACTIONS } from '@/constants/reactions';
 
@@ -26,6 +26,45 @@ function timeAgo(iso: string): string {
   if (secs < 3600) return `${Math.floor(secs / 60)}m`;
   if (secs < 86400) return `${Math.floor(secs / 3600)}h`;
   return `${Math.floor(secs / 86400)}d`;
+}
+
+function CommentPreview({ comments, onPress }: { comments: Comment[]; onPress: () => void }) {
+  const sorted = [...comments].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+  const preview = sorted.slice(-2);
+  const count = comments.length;
+
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={styles.commentSection}>
+      {count === 0 ? (
+        <Text style={styles.addCommentPrompt}>Add a comment…</Text>
+      ) : (
+        <>
+          {preview.map(c => {
+            const uname = c.profiles?.username ?? 'unknown';
+            const body = c.body
+              ? (c.gif_url ? `${c.body} 🖼` : c.body)
+              : '🖼 GIF';
+            return (
+              <View key={c.id} style={styles.previewRow}>
+                <View style={styles.previewAvatar}>
+                  <Text style={styles.previewAvatarChar}>{uname[0]?.toUpperCase()}</Text>
+                </View>
+                <Text style={styles.previewLine} numberOfLines={1}>
+                  <Text style={styles.previewUsername}>@{uname} </Text>
+                  {body}
+                </Text>
+              </View>
+            );
+          })}
+          <Text style={styles.viewAllText}>
+            View all {count} {count === 1 ? 'comment' : 'comments'}
+          </Text>
+        </>
+      )}
+    </TouchableOpacity>
+  );
 }
 
 export default function PostCard({ post, currentUserId, onReact, onCommentPress }: Props) {
@@ -102,12 +141,10 @@ export default function PostCard({ post, currentUserId, onReact, onCommentPress 
           </View>
         )}
 
-        <TouchableOpacity style={styles.commentBtn} onPress={() => onCommentPress(post.id)} activeOpacity={0.7}>
-          <Ionicons name="chatbubble-outline" size={15} color={COLORS.textSecondary} />
-          <Text style={styles.commentCount}>
-            {post.comments?.length ?? 0} {(post.comments?.length ?? 0) === 1 ? 'comment' : 'comments'}
-          </Text>
-        </TouchableOpacity>
+        <CommentPreview
+          comments={post.comments ?? []}
+          onPress={() => onCommentPress(post.id)}
+        />
 
         <View style={styles.reactionsRow}>
           {visibleBubbles.map(r => (
@@ -207,8 +244,18 @@ const styles = StyleSheet.create({
   },
   extraBadgeText: { fontSize: 12, color: COLORS.textMuted, fontWeight: '600' },
 
-  commentBtn: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  commentCount: { fontSize: 13, color: COLORS.textSecondary, fontWeight: '600' },
+  commentSection: { gap: 5 },
+  addCommentPrompt: { fontSize: 13, color: COLORS.textMuted },
+  previewRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  previewAvatar: {
+    width: 18, height: 18, borderRadius: 9,
+    backgroundColor: COLORS.surfaceLight, justifyContent: 'center', alignItems: 'center',
+    flexShrink: 0,
+  },
+  previewAvatarChar: { fontSize: 8, fontWeight: '900', color: COLORS.textSecondary },
+  previewLine: { flex: 1, fontSize: 13, color: COLORS.text, lineHeight: 18 },
+  previewUsername: { fontWeight: '700' },
+  viewAllText: { fontSize: 12, color: COLORS.textMuted, marginTop: 1 },
 
   // Reaction bubbles
   reactionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, alignItems: 'center' },

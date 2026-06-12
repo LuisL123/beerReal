@@ -5,7 +5,7 @@ import {
   ScrollView, Modal, TouchableWithoutFeedback, Dimensions,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
@@ -44,6 +44,7 @@ function timeAgo(iso: string): string {
 export default function CommentsScreen() {
   const { postId, username } = useLocalSearchParams<{ postId: string; username: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -255,7 +256,7 @@ export default function CommentsScreen() {
         )}
 
         {/* Bottom input area */}
-        <View style={styles.bottomArea}>
+        <View style={[styles.bottomArea, { paddingBottom: insets.bottom + 8 }]}>
           {/* GIF preview (when selected) */}
           {gifUrl && (
             <View style={styles.gifPreviewWrap}>

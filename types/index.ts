@@ -20,7 +20,7 @@ export interface Post {
   created_at: string;
   profiles?: Profile;
   reactions?: Reaction[];
-  comments?: { id: string }[];
+  comments?: Comment[];
 }
 
 export type ReactionKind = 'same' | 'rough' | 'jealous' | 'respect' | 'lightweight' | 'suspicious';
