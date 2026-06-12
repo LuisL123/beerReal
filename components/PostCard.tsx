@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Post, Comment, ReactionKind } from '@/types';
 import { COLORS } from '@/constants/colors';
 import { REACTIONS } from '@/constants/reactions';
+import BadgeAvatar from '@/components/BadgeAvatar';
 
 interface Props {
   post: Post;
@@ -102,9 +103,7 @@ export default function PostCard({ post, currentUserId, onReact, onCommentPress 
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarChar}>{username[0]?.toUpperCase()}</Text>
-        </View>
+        <BadgeAvatar username={username} size={36} badge={post.profiles?.pinned_badge} />
         <Text style={styles.username}>@{username}</Text>
         <View style={styles.meta}>
           <View style={styles.drinkBadge}>

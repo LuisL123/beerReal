@@ -11,6 +11,7 @@ import * as Haptics from 'expo-haptics';
 import { supabase } from '@/lib/supabase';
 import { COLORS } from '@/constants/colors';
 import { Comment } from '@/types';
+import BadgeAvatar from '@/components/BadgeAvatar';
 
 const { width: SW } = Dimensions.get('window');
 const GIF_COL_WIDTH = (SW - 20) / 2; // 8px padding each side + 4px gap
@@ -91,7 +92,7 @@ export default function CommentsScreen() {
   const fetchComments = async () => {
     const { data } = await supabase
       .from('comments')
-      .select('*, profiles(id, username, avatar_url)')
+      .select('*, profiles(id, username, avatar_url, pinned_badge)')
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
     if (data) setComments(data as Comment[]);
@@ -177,9 +178,7 @@ export default function CommentsScreen() {
     const uname = item.profiles?.username ?? 'unknown';
     return (
       <View style={styles.commentRow}>
-        <View style={styles.commentAvatar}>
-          <Text style={styles.commentAvatarChar}>{uname[0]?.toUpperCase()}</Text>
-        </View>
+        <BadgeAvatar username={uname} size={30} badge={item.profiles?.pinned_badge} />
         <View style={styles.commentContent}>
           <View style={styles.commentMeta}>
             <Text style={styles.commentUsername}>@{uname}</Text>

@@ -22,7 +22,7 @@ export default function FeedScreen() {
 
     const { data } = await supabase
       .from('posts')
-      .select('*, profiles(id, username, avatar_url), reactions(id, user_id, reaction_type), comments(id, body, gif_url, created_at, user_id, profiles(id, username))')
+      .select('*, profiles(id, username, avatar_url, pinned_badge), reactions(id, user_id, reaction_type), comments(id, body, gif_url, created_at, user_id, profiles(id, username))')
       .order('created_at', { ascending: false })
       .limit(30);
 

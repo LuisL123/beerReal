@@ -5,6 +5,7 @@ export interface Profile {
   verified_beer_count: number;
   self_reported_count: number;
   beer_count: number; // generated column: verified_beer_count + self_reported_count
+  pinned_badge: string | null;
   created_at: string;
 }
 
@@ -44,5 +45,6 @@ export interface Comment {
     id: string;
     username: string;
     avatar_url: string | null;
+    pinned_badge?: string | null;
   };
 }
