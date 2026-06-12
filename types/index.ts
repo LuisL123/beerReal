@@ -20,12 +20,29 @@ export interface Post {
   created_at: string;
   profiles?: Profile;
   reactions?: Reaction[];
+  comments?: { id: string }[];
 }
+
+export type ReactionKind = 'same' | 'rough' | 'jealous' | 'respect' | 'lightweight' | 'suspicious';
 
 export interface Reaction {
   id: string;
   post_id: string;
   user_id: string;
-  type: string;
+  reaction_type: ReactionKind;
   created_at: string;
+}
+
+export interface Comment {
+  id: string;
+  post_id: string;
+  user_id: string;
+  body: string | null;
+  gif_url: string | null;
+  created_at: string;
+  profiles?: {
+    id: string;
+    username: string;
+    avatar_url: string | null;
+  };
 }

@@ -29,20 +29,37 @@ create table if not exists public.posts (
   created_at  timestamptz not null default now()
 );
 
--- Reactions (one cheers per user per post)
+-- Reaction kinds
+create type if not exists public.reaction_kind as enum (
+  'same', 'rough', 'jealous', 'respect', 'lightweight', 'suspicious'
+);
+
+-- Reactions (up to one of each kind per user per post)
 create table if not exists public.reactions (
+  id            uuid primary key default gen_random_uuid(),
+  post_id       uuid references public.posts(id) on delete cascade not null,
+  user_id       uuid references public.profiles(id) on delete cascade not null,
+  reaction_type public.reaction_kind not null default 'same',
+  created_at    timestamptz not null default now(),
+  unique(post_id, user_id, reaction_type)
+);
+
+-- Comments
+create table if not exists public.comments (
   id          uuid primary key default gen_random_uuid(),
-  post_id     uuid references public.posts(id) on delete cascade not null,
+  post_id     uuid references public.posts(id)    on delete cascade not null,
   user_id     uuid references public.profiles(id) on delete cascade not null,
-  type        text not null default 'cheers',
+  body        text,
+  gif_url     text,
   created_at  timestamptz not null default now(),
-  unique(post_id, user_id)
+  constraint comment_has_content check (body is not null or gif_url is not null)
 );
 
 -- ── Row Level Security ──────────────────────────────────────
 alter table public.profiles  enable row level security;
 alter table public.posts      enable row level security;
 alter table public.reactions  enable row level security;
+alter table public.comments   enable row level security;
 
 -- Profiles
 create policy "profiles_select" on public.profiles for select using (true);
@@ -58,6 +75,11 @@ create policy "posts_delete" on public.posts for delete using (auth.uid() = user
 create policy "reactions_select" on public.reactions for select using (true);
 create policy "reactions_insert" on public.reactions for insert with check (auth.uid() = user_id);
 create policy "reactions_delete" on public.reactions for delete using (auth.uid() = user_id);
+
+-- Comments
+create policy "comments_select" on public.comments for select using (true);
+create policy "comments_insert" on public.comments for insert with check (auth.uid() = user_id);
+create policy "comments_delete" on public.comments for delete using (auth.uid() = user_id);
 
 -- ── Atomic beer-count increment ─────────────────────────────
 -- Called via supabase.rpc('increment_beer_counts', { uid, photo_n, extra_n })
