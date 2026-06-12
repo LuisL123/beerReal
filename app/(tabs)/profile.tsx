@@ -77,6 +77,11 @@ export default function ProfileScreen() {
                 <Text style={styles.counterEmoji}>🍺</Text>
                 <Text style={styles.counterNum}>{profile?.beer_count ?? 0}</Text>
                 <Text style={styles.counterLabel}>beers</Text>
+                {((profile?.verified_beer_count ?? 0) > 0 || (profile?.self_reported_count ?? 0) > 0) && (
+                  <Text style={styles.counterBreakdown}>
+                    {profile?.verified_beer_count ?? 0} 📸 verified · {profile?.self_reported_count ?? 0} self-reported
+                  </Text>
+                )}
               </View>
 
               <View style={styles.statsRow}>
@@ -130,6 +135,7 @@ const styles = StyleSheet.create({
   counterEmoji: { fontSize: 40, marginBottom: 8 },
   counterNum: { fontSize: 56, fontWeight: '900', color: COLORS.primary, lineHeight: 64 },
   counterLabel: { fontSize: 14, color: COLORS.textSecondary, fontWeight: '500', marginTop: 2 },
+  counterBreakdown: { fontSize: 12, color: COLORS.textMuted, fontWeight: '500', marginTop: 6, textAlign: 'center' },
   statsRow: { flexDirection: 'row', gap: 32 },
   stat: { alignItems: 'center' },
   statVal: { fontSize: 22, fontWeight: '800', color: COLORS.text },

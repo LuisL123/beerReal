@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Post } from '@/types';
 import { COLORS } from '@/constants/colors';
@@ -27,6 +27,9 @@ export default function PostCard({ post, currentUserId, onCheers }: Props) {
   const count = reactions.length;
   const username = post.profiles?.username ?? 'unknown';
 
+  const photoCount = post.photo_count ?? 1;
+  const allPhotos = [post.image_url, ...(post.image_urls ?? [])];
+
   const handleCheers = async () => {
     await Haptics.impactAsync(reacted ? Haptics.ImpactFeedbackStyle.Light : Haptics.ImpactFeedbackStyle.Medium);
     onCheers(post.id, reacted);
@@ -47,12 +50,38 @@ export default function PostCard({ post, currentUserId, onCheers }: Props) {
         </View>
       </View>
 
-      <Image source={{ uri: post.image_url }} style={styles.photo} resizeMode="cover" />
+      {photoCount > 1 ? (
+        <View>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            style={{ width: PHOTO_SIZE }}
+          >
+            {allPhotos.map((uri, idx) => (
+              <Image key={idx} source={{ uri }} style={styles.photo} resizeMode="cover" />
+            ))}
+          </ScrollView>
+          <View style={styles.dotsRow}>
+            {allPhotos.map((_, idx) => (
+              <View key={idx} style={styles.dot} />
+            ))}
+          </View>
+        </View>
+      ) : (
+        <Image source={{ uri: post.image_url }} style={styles.photo} resizeMode="cover" />
+      )}
 
       <View style={styles.cardFooter}>
         {post.caption ? (
           <Text style={styles.caption} numberOfLines={3}>{post.caption}</Text>
         ) : null}
+
+        {(post.extra_count ?? 0) > 0 && (
+          <View style={styles.extraBadge}>
+            <Text style={styles.extraBadgeText}>+{post.extra_count} more (unverified)</Text>
+          </View>
+        )}
 
         <TouchableOpacity style={styles.cheersRow} onPress={handleCheers} activeOpacity={0.7}>
           <Text style={[styles.cheersEmoji, !reacted && styles.cheersEmojiMuted]}>🍺</Text>
@@ -93,8 +122,16 @@ const styles = StyleSheet.create({
   badgeText: { fontSize: 11, fontWeight: '700', color: COLORS.primary },
   time: { fontSize: 11, color: COLORS.textMuted },
   photo: { width: PHOTO_SIZE, height: PHOTO_SIZE, backgroundColor: COLORS.surfaceLight },
+  dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 5, paddingVertical: 8 },
+  dot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: COLORS.primary },
   cardFooter: { paddingHorizontal: 14, paddingVertical: 12, gap: 10 },
   caption: { fontSize: 14, color: COLORS.text, lineHeight: 20 },
+  extraBadge: {
+    alignSelf: 'flex-start', backgroundColor: COLORS.surfaceLight,
+    borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4,
+    borderWidth: 1, borderColor: COLORS.border,
+  },
+  extraBadgeText: { fontSize: 12, color: COLORS.textMuted, fontWeight: '600' },
   cheersRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   cheersEmoji: { fontSize: 22 },
   cheersEmojiMuted: { opacity: 0.45 },
